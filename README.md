@@ -46,7 +46,7 @@ C6-accounting/
 │       ├── tauri.ts        # Typed invoke wrappers
 │       └── stores/app.ts   # activeOrg, activePeriod, currentRoute
 │
-└── worker/                 # Cloudflare Worker → api.C6.c22.space
+└── worker/                 # Cloudflare Worker → api.c6.c22.space
     ├── src/
     │   ├── index.ts        # Route dispatch
     │   ├── auth.ts         # JWT issue/refresh + 14-day trial activation
@@ -147,7 +147,7 @@ cd worker && pnpm deploy
 
 ```
 App (tauri-plugin-updater)
-  → GET https://api.C6.c22.space/updates/check?platform=darwin-aarch64&version=x.y.z
+  → GET https://api.c6.c22.space/updates/check?platform=darwin-aarch64&version=x.y.z
   → Worker reads latest.json from R2
   → Returns { version, url (signed R2 URL), signature (ed25519) }
   → App verifies signature, downloads, applies
