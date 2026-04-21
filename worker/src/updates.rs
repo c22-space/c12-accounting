@@ -63,7 +63,7 @@ pub async fn handle(req: Request, env: &Env) -> Result<Response> {
     }))
 }
 
-fn is_newer(latest: &str, current: &str) -> bool {
+pub(crate) fn is_newer(latest: &str, current: &str) -> bool {
     let parse = |v: &str| -> (u32, u32, u32) {
         let s = v.trim_start_matches('v');
         let mut parts = s.split('.').map(|p| p.parse::<u32>().unwrap_or(0));
@@ -76,4 +76,46 @@ fn is_newer(latest: &str, current: &str) -> bool {
     let (la, lb, lc) = parse(latest);
     let (ca, cb, cc) = parse(current);
     (la, lb, lc) > (ca, cb, cc)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn same_version_is_not_newer() {
+        assert!(!is_newer("1.2.3", "1.2.3"));
+    }
+
+    #[test]
+    fn patch_bump_is_newer() {
+        assert!(is_newer("1.2.4", "1.2.3"));
+    }
+
+    #[test]
+    fn minor_bump_is_newer() {
+        assert!(is_newer("1.3.0", "1.2.9"));
+    }
+
+    #[test]
+    fn major_bump_is_newer() {
+        assert!(is_newer("2.0.0", "1.9.9"));
+    }
+
+    #[test]
+    fn older_server_is_not_newer() {
+        assert!(!is_newer("1.0.0", "1.2.3"));
+    }
+
+    #[test]
+    fn v_prefix_is_stripped() {
+        assert!(is_newer("v1.2.4", "v1.2.3"));
+        assert!(!is_newer("v1.2.3", "v1.2.3"));
+    }
+
+    #[test]
+    fn mixed_prefix_normalised() {
+        assert!(is_newer("v2.0.0", "1.9.9"));
+        assert!(is_newer("2.0.0", "v1.9.9"));
+    }
 }
